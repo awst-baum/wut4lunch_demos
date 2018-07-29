@@ -3,7 +3,7 @@ from flask import Flask
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy(app)
 
 class Lunch(db.Model):
@@ -12,7 +12,7 @@ class Lunch(db.Model):
     submitter = db.Column(db.String(63))
     food = db.Column(db.String(255))
 
-from flask.ext.wtf import Form
+from flask_wtf import Form
 from wtforms.fields import StringField, SubmitField
 
 app.config['SECRET_KEY'] = 'please, tell nobody'
