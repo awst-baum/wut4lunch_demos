@@ -16,10 +16,8 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import include, path
-from wut4lunch import views as wut4lunch_views 
 
 urlpatterns = [
-    path('', wut4lunch_views.index, name='home'),
-    path('newlunch/', wut4lunch_views.newlunch, name='newlunch'),
+    path('', include('wut4lunch.urls')),
     path('admin/', admin.site.urls),
 ]
