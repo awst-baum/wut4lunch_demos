@@ -12,7 +12,8 @@ class Lunch(db.Model):
     submitter = db.Column(db.String(63))
     food = db.Column(db.String(255))
 
-from flask_wtf import Form
+#from flask_wtf import Form
+from flask_wtf import FlaskForm as Form
 from wtforms.fields import StringField, SubmitField
 
 app.config['SECRET_KEY'] = 'please, tell nobody'
