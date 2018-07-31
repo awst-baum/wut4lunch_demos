@@ -51,8 +51,6 @@ def newlunch():
     return redirect(url_for('root'))
 
 
-lunches = Lunch.query.all()
-
 resource_fields = {
     'submitter':   fields.String,
     'food':        fields.String,
@@ -67,7 +65,7 @@ class RestLunch(Resource):
     @marshal_with(resource_fields)
     def get(self, lunch_id):
         try:
-            l = lunches[lunch_id]
+            l = Lunch.query.filter_by(id=lunch_id).first()
         except IndexError as ie:
             abort(404, message="Lunch {} doesn't exist".format(lunch_id))
             
@@ -77,7 +75,6 @@ class RestLunch(Resource):
     def put(self, lunch_id):
         newlunch = Lunch() ## TODO: figure out how to get data passed
         try:
-            lunches[lunch_id] = newlunch
             db.session.add(newlunch)
             db.session.commit()
         except IndexError as ie:
