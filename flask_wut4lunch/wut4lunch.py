@@ -1,14 +1,25 @@
-from flask import Flask, request
+from flask import Flask
+from flask import render_template
+from flask import url_for, redirect
+from flask_login import LoginManager
 from flask_restful import Resource, Api
-from flask_restful import fields, reqparse, marshal_with, abort
+from flask_restful import fields, marshal_with, abort
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm as Form
+from wtforms.fields import StringField, SubmitField
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SECRET_KEY'] = 'please, tell nobody'
 
+login_manager = LoginManager()
+login_manager.init_app(app)
+db = SQLAlchemy(app)
 rest_api = Api(app)
 
-from flask_sqlalchemy import SQLAlchemy
-db = SQLAlchemy(app)
+users = {'foo@bar.tld': {'password': 'secret'}}
+
 
 class Lunch(db.Model):
     """A single lunch"""
@@ -19,26 +30,17 @@ class Lunch(db.Model):
     def __str__(self):
         return "{} ate {}".format(self.submitter, self.food)
 
-#from flask_wtf import Form
-from flask_wtf import FlaskForm as Form
-from wtforms.fields import StringField, SubmitField
-
-app.config['SECRET_KEY'] = 'please, tell nobody'
 
 class LunchForm(Form):
     submitter = StringField(u'Hi, my name is')
     food = StringField(u'and I ate')
     submit = SubmitField(u'share my lunch!')
 
-from flask import render_template
-
 @app.route("/")
 def root():
     lunches = Lunch.query.all()
     form = LunchForm()
     return render_template('index.html', form=form, lunches=lunches)
-
-from flask import url_for, redirect
 
 @app.route(u'/new', methods=[u'POST'])
 def newlunch():
@@ -57,10 +59,6 @@ resource_fields = {
 #     'uri':         fields.Url('lunch_ep')
 }
 
-parser = reqparse.RequestParser()
-parser.add_argument('submitter')
-parser.add_argument('food')
-
 class RestLunch(Resource):
     @marshal_with(resource_fields)
     def get(self, lunch_id):
@@ -73,7 +71,7 @@ class RestLunch(Resource):
 
     @marshal_with(resource_fields)
     def put(self, lunch_id):
-        newlunch = Lunch() ## TODO: figure out how to get data passed
+        newlunch = Lunch() ## TODO: figure out how to get data
         try:
             db.session.add(newlunch)
             db.session.commit()
